@@ -39,3 +39,4 @@
 
 # debug information files
 *.dwo
+/lab1a/googletest-1.17.0/

@@ -23,16 +23,20 @@ int main(int argc, char** argv)
     map<string, int> wordCount;
     int totalWords = 0;
 
-    while (getline(fin, line)) {
+    while (getline(fin, line))
+    {
         string word;
-        for (size_t i = 0; i <= line.size(); i++) {
+        for (size_t i = 0; i <= line.size(); i++)
+        {
             char c = (i < line.size()) ? line[i] : ' ';
             if (iswalnum(c))
             {
                 word += c;
-            } else
+            }
+            else
             {
-                if (!word.empty()) {
+                if (!word.empty())
+                {
                     wordCount[word]++;
                     totalWords++;
                     word.clear();
@@ -46,15 +50,18 @@ int main(int argc, char** argv)
     // }
 
     vector<pair<string, int>> words(wordCount.begin(), wordCount.end());
-    sort(words.begin(), words.end(), [](const auto& a, const auto& b) {
-        if (a.second == b.second) {
+    sort(words.begin(), words.end(), [](const auto& a, const auto& b)
+    {
+        if (a.second == b.second)
+        {
             return a.first < b.first;
         }
         return a.second > b.second;
     });
 
     fout << "Word,Frequency,Frequency(%)\n";
-    for (const auto& pair : words) {
+    for (const auto& pair : words)
+    {
         double percentage = (static_cast<double>(pair.second) / totalWords) * 100.0;
         fout << pair.first << "," << pair.second << "," << (int)percentage << "\n";
     }
