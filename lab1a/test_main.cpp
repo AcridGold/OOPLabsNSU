@@ -1053,3 +1053,21 @@ TEST_F(BitArrayTest, SetAllWithExactBlockSize) {
 
     EXPECT_EQ(ba.size(), BITS_PER_ULONG);
 }
+
+TEST_F(BitArrayTest, BitArrayTest_XOR_Invalid_Test)
+{
+    BitArray ba(10, 5), bb(5, 6);
+    EXPECT_ANY_THROW(ba^bb);
+}
+
+TEST_F(BitArrayTest, BitArrayTest_OR_Invalid_Test)
+{
+    BitArray ba(10, 5), bb(5, 6);
+    EXPECT_ANY_THROW(ba|bb);
+}
+
+TEST_F(BitArrayTest, BitArrayTest_AND_Invalid_Test)
+{
+    BitArray ba(10, 5), bb(5, 6);
+    EXPECT_ANY_THROW(ba&bb);
+}
