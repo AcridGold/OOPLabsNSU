@@ -40,3 +40,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(GameOfLife PRIVATE --coverage)
     target_link_options(GameOfLife PRIVATE --coverage)
 endif()
+
+if (MINGW)
+    target_link_options(GameOfLife PRIVATE "-static" "-static-libgcc" "-static-libstdc++")
+endif()
