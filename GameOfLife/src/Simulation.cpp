@@ -81,7 +81,7 @@ int Simulation::GetCellValue(int row, int column) const {
 }
 
 // Trim both ends (safe for empty/all-space strings)
-static inline std::string trim_copy(const std::string& s) {
+static std::string trim_copy(const std::string& s) {
     if (s.empty()) return std::string();
     size_t first = 0;
     while (first < s.size() && std::isspace(static_cast<unsigned char>(s[first]))) ++first;
