@@ -1,5 +1,7 @@
 #include "raylib.h"
 #include "Simulation.h"
+#include <vector>
+#include <string>
 
 int main() {
     const int WINDOW_WIDTH = 1920;
@@ -13,8 +15,11 @@ int main() {
 
     Simulation simulation(WINDOW_WIDTH, WINDOW_HEIGHT, CELL_SIZE);
 
-    // Modal dialog state
     bool showClearDialog = false;
+
+    std::vector<std::string> lifeWarnings;
+    bool showWarnings = false;
+    int warningsTimer = 0;
 
     // Button dimensions
     const int BUTTON_WIDTH = 300;
@@ -53,6 +58,21 @@ int main() {
                 SetTargetFPS(currentTargetFPS);
             }
 
+            if (IsKeyPressed(KEY_O)) {
+                lifeWarnings.clear();
+                bool ok = simulation.LoadFromLife106("pattern.lif", lifeWarnings);
+                showWarnings = true;
+                warningsTimer = 600;
+                if (!ok) {
+                    lifeWarnings.push_back("Failed to load pattern.lif");
+                }
+            }
+
+            if (IsKeyPressed(KEY_F1)) {
+                showWarnings = !showWarnings;
+                if (showWarnings) warningsTimer = 600;
+            }
+
             simulation.Update();
         }
 
@@ -62,8 +82,13 @@ int main() {
         simulation.Draw();
 
         // Instructions
-        DrawText("ENTER - Start | SPACE - Pause | R - Random | C - Clear | F - Speed", 10, 10, 20, LIGHTGRAY);
+        DrawText("ENTER - Start | SPACE - Pause | R - Random | C - Clear | F - Speed | O - Load pattern.lif", 10, 10, 20, LIGHTGRAY);
         DrawText(TextFormat("%s | Target FPS: %d", simulation.IsRunning() ? "Running" : "Paused", currentTargetFPS), WINDOW_WIDTH - 400, 10, 20, simulation.IsRunning() ? GREEN : RED);
+
+        // Show universe name if any
+        if (!simulation.GetUniverseName().empty()) {
+            DrawText(TextFormat("Universe: %s", simulation.GetUniverseName().c_str()), WINDOW_WIDTH - 400, 40, 20, LIGHTGRAY);
+        }
 
         // Подтверждение очистки
         if (showClearDialog) {
@@ -120,6 +145,24 @@ int main() {
             if (IsKeyPressed(KEY_ESCAPE)) {
                 showClearDialog = false;
             }
+        }
+
+        if (showWarnings && !lifeWarnings.empty()) {
+            int boxW = 800;
+            int boxH = 200;
+            int boxX = (WINDOW_WIDTH - boxW) / 2;
+            int boxY = WINDOW_HEIGHT - boxH - 20;
+            DrawRectangle(boxX, boxY, boxW, boxH, Color{0, 0, 0, 200});
+            DrawRectangleLines(boxX, boxY, boxW, boxH, WHITE);
+            int y = boxY + 8;
+            int i = 0;
+            for (const auto& w : lifeWarnings) {
+                DrawText(w.c_str(), boxX + 8, y, 16, LIGHTGRAY);
+                y += 18;
+                if (++i >= 10) break;
+            }
+            if (warningsTimer > 0) warningsTimer--;
+            if (warningsTimer == 0) showWarnings = false;
         }
 
         EndDrawing();
