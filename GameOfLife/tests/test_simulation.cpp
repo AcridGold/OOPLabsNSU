@@ -3,33 +3,36 @@
 #include "Simulation.h"
 #include <fstream>
 
-static Simulation makeSmallSim() {
+static Simulation makeSmallSim()
+{
     return Simulation(30, 30, 10);
 }
 
-TEST(GridBasics, SetGetToggleClear) {
+TEST(GridBasics, SetGetToggleClear)
+{
     Grid g(30, 20, 10);
     EXPECT_EQ(g.GetRows(), 2);
     EXPECT_EQ(g.GetColumns(), 3);
 
     EXPECT_EQ(g.GetCellValue(0,0), 0);
-    g.SetCellValue(0,0,1);
+    g.SetCellValue(0, 0, 1);
     EXPECT_EQ(g.GetCellValue(0,0), 1);
-    g.ToggleCell(0,0);
+    g.ToggleCell(0, 0);
     EXPECT_EQ(g.GetCellValue(0,0), 0);
 
-    g.SetCellValue(1,2,1);
+    g.SetCellValue(1, 2, 1);
     EXPECT_EQ(g.GetCellValue(1,2), 1);
     g.Clear();
     EXPECT_EQ(g.GetCellValue(1,2), 0);
 }
 
-TEST(SimulationStep, BlinkerOscillator) {
+TEST(SimulationStep, BlinkerOscillator)
+{
     Simulation sim = makeSmallSim();
     sim.ClearGrid();
-    sim.ToggleCell(1,0);
-    sim.ToggleCell(1,1);
-    sim.ToggleCell(1,2);
+    sim.ToggleCell(1, 0);
+    sim.ToggleCell(1, 1);
+    sim.ToggleCell(1, 2);
 
     sim.Step();
 
@@ -41,21 +44,25 @@ TEST(SimulationStep, BlinkerOscillator) {
     EXPECT_EQ(sim.GetCellValue(1,2), 0);
 }
 
-TEST(ToroidalWrap, NeighborsWrapAround) {
+TEST(ToroidalWrap, NeighborsWrapAround)
+{
     Simulation sim = makeSmallSim();
     sim.ClearGrid();
-    sim.ToggleCell(0,0);
-    sim.ToggleCell(2,2);
+    sim.ToggleCell(0, 0);
+    sim.ToggleCell(2, 2);
     sim.Step();
-    for (int r = 0; r < sim.GetRows(); ++r) {
-        for (int c = 0; c < sim.GetColumns(); ++c) {
-            int val = sim.GetCellValue(r,c);
+    for (int r = 0; r < sim.GetRows(); ++r)
+    {
+        for (int c = 0; c < sim.GetColumns(); ++c)
+        {
+            int val = sim.GetCellValue(r, c);
             EXPECT_TRUE(val == 0 || val == 1);
         }
     }
 }
 
-TEST(LoadSaveRoundtrip, LoadFromFile) {
+TEST(LoadSaveRoundtrip, LoadFromFile)
+{
     const std::string path = "tests_tmp_pattern.lif";
     std::ofstream out(path);
     out << "Life 1.06\n";
@@ -77,7 +84,8 @@ TEST(LoadSaveRoundtrip, LoadFromFile) {
     std::remove(path.c_str());
 }
 
-TEST(ParserWarnings, DuplicateCoordinateWarning) {
+TEST(ParserWarnings, DuplicateCoordinateWarning)
+{
     const std::string path = "tests_tmp_dup.lif";
     std::ofstream out(path);
     out << "Life 1.06\n";
@@ -92,15 +100,16 @@ TEST(ParserWarnings, DuplicateCoordinateWarning) {
     bool ok = sim.LoadFromLife106(path, warnings);
     EXPECT_TRUE(ok);
     bool foundDuplicate = false;
-    for (auto &w : warnings) {
+    for (auto& w : warnings)
+    {
         if (w.find("Duplicate") != std::string::npos) foundDuplicate = true;
     }
     EXPECT_TRUE(foundDuplicate);
     std::remove(path.c_str());
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-

@@ -3,7 +3,8 @@
 #include <vector>
 #include <string>
 
-int main() {
+int main()
+{
     const int WINDOW_WIDTH = 1920;
     const int WINDOW_HEIGHT = 1200;
     const int CELL_SIZE = 10;
@@ -26,49 +27,60 @@ int main() {
     const int BUTTON_HEIGHT = 100;
     const int BUTTON_SPACING = 100;
 
-    while (!WindowShouldClose()) {
-        if (!showClearDialog) {
-            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+    while (!WindowShouldClose())
+    {
+        if (!showClearDialog)
+        {
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+            {
                 Vector2 mousePos = GetMousePosition();
                 int row = static_cast<int>(mousePos.y) / CELL_SIZE;
                 int column = static_cast<int>(mousePos.x) / CELL_SIZE;
                 simulation.ToggleCell(row, column);
             }
 
-            if (IsKeyPressed(KEY_ENTER)) {
+            if (IsKeyPressed(KEY_ENTER))
+            {
                 simulation.Start();
                 SetWindowTitle("Conway's Game of Life - Running");
             }
 
-            if (IsKeyPressed(KEY_SPACE)) {
+            if (IsKeyPressed(KEY_SPACE))
+            {
                 simulation.Stop();
                 SetWindowTitle("Conway's Game of Life - Paused");
             }
 
-            if (IsKeyPressed(KEY_R)) {
+            if (IsKeyPressed(KEY_R))
+            {
                 simulation.CreateRandomState();
             }
 
-            if (IsKeyPressed(KEY_C)) {
+            if (IsKeyPressed(KEY_C))
+            {
                 showClearDialog = true;
             }
 
-            if (IsKeyPressed(KEY_F)) {
+            if (IsKeyPressed(KEY_F))
+            {
                 currentTargetFPS = (currentTargetFPS == 10) ? 60 : 10;
                 SetTargetFPS(currentTargetFPS);
             }
 
-            if (IsKeyPressed(KEY_O)) {
+            if (IsKeyPressed(KEY_O))
+            {
                 lifeWarnings.clear();
                 bool ok = simulation.LoadFromLife106("pattern.lif", lifeWarnings);
                 showWarnings = true;
                 warningsTimer = 600;
-                if (!ok) {
+                if (!ok)
+                {
                     lifeWarnings.push_back("Failed to load pattern.lif");
                 }
             }
 
-            if (IsKeyPressed(KEY_F1)) {
+            if (IsKeyPressed(KEY_F1))
+            {
                 showWarnings = !showWarnings;
                 if (showWarnings) warningsTimer = 600;
             }
@@ -82,16 +94,21 @@ int main() {
         simulation.Draw();
 
         // Instructions
-        DrawText("ENTER - Start | SPACE - Pause | R - Random | C - Clear | F - Speed | O - Load pattern.lif", 10, 10, 20, LIGHTGRAY);
-        DrawText(TextFormat("%s | Target FPS: %d", simulation.IsRunning() ? "Running" : "Paused", currentTargetFPS), WINDOW_WIDTH - 400, 10, 20, simulation.IsRunning() ? GREEN : RED);
+        DrawText("ENTER - Start | SPACE - Pause | R - Random | C - Clear | F - Speed | O - Load pattern.lif", 10, 10,
+                 20, LIGHTGRAY);
+        DrawText(TextFormat("%s | Target FPS: %d", simulation.IsRunning() ? "Running" : "Paused", currentTargetFPS),
+                 WINDOW_WIDTH - 400, 10, 20, simulation.IsRunning() ? GREEN : RED);
 
         // Show universe name if any
-        if (!simulation.GetUniverseName().empty()) {
-            DrawText(TextFormat("Universe: %s", simulation.GetUniverseName().c_str()), WINDOW_WIDTH - 400, 40, 20, LIGHTGRAY);
+        if (!simulation.GetUniverseName().empty())
+        {
+            DrawText(TextFormat("Universe: %s", simulation.GetUniverseName().c_str()), WINDOW_WIDTH - 400, 40, 20,
+                     LIGHTGRAY);
         }
 
         // Подтверждение очистки
-        if (showClearDialog) {
+        if (showClearDialog)
+        {
             // Затемнение фона
             DrawRectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, Color{0, 0, 0, 180});
 
@@ -111,10 +128,14 @@ int main() {
             int yesButtonX = dialogX + (dialogWidth / 2) - BUTTON_WIDTH - BUTTON_SPACING / 2;
             int noButtonX = dialogX + (dialogWidth / 2) + BUTTON_SPACING / 2;
 
-            Rectangle yesButton = {static_cast<float>(yesButtonX), static_cast<float>(buttonY),
-                                   static_cast<float>(BUTTON_WIDTH), static_cast<float>(BUTTON_HEIGHT)};
-            Rectangle noButton = {static_cast<float>(noButtonX), static_cast<float>(buttonY),
-                                  static_cast<float>(BUTTON_WIDTH), static_cast<float>(BUTTON_HEIGHT)};
+            Rectangle yesButton = {
+                static_cast<float>(yesButtonX), static_cast<float>(buttonY),
+                static_cast<float>(BUTTON_WIDTH), static_cast<float>(BUTTON_HEIGHT)
+            };
+            Rectangle noButton = {
+                static_cast<float>(noButtonX), static_cast<float>(buttonY),
+                static_cast<float>(BUTTON_WIDTH), static_cast<float>(BUTTON_HEIGHT)
+            };
 
             Vector2 mousePos = GetMousePosition();
             bool yesHovered = CheckCollisionPointRec(mousePos, yesButton);
@@ -133,21 +154,27 @@ int main() {
             DrawText("No", noButtonX + (BUTTON_WIDTH - noTextWidth) / 2, buttonY + 12, 25, WHITE);
 
             // Обработка кликов
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                if (yesHovered) {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            {
+                if (yesHovered)
+                {
                     simulation.ClearGrid();
                     showClearDialog = false;
-                } else if (noHovered) {
+                }
+                else if (noHovered)
+                {
                     showClearDialog = false;
                 }
             }
 
-            if (IsKeyPressed(KEY_ESCAPE)) {
+            if (IsKeyPressed(KEY_ESCAPE))
+            {
                 showClearDialog = false;
             }
         }
 
-        if (showWarnings && !lifeWarnings.empty()) {
+        if (showWarnings && !lifeWarnings.empty())
+        {
             int boxW = 800;
             int boxH = 200;
             int boxX = (WINDOW_WIDTH - boxW) / 2;
@@ -156,7 +183,8 @@ int main() {
             DrawRectangleLines(boxX, boxY, boxW, boxH, WHITE);
             int y = boxY + 8;
             int i = 0;
-            for (const auto& w : lifeWarnings) {
+            for (const auto& w : lifeWarnings)
+            {
                 DrawText(w.c_str(), boxX + 8, y, 16, LIGHTGRAY);
                 y += 18;
                 if (++i >= 10) break;

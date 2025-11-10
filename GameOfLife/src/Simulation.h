@@ -4,10 +4,11 @@
 #include <vector>
 #include <array>
 
-class Simulation {
+class Simulation
+{
 public:
     Simulation(int width, int height, int cellSize);
-    
+
     void Draw() const;
     void Update();
     void Step();
@@ -30,7 +31,7 @@ public:
 
 private:
     int CountLiveNeighbors(int row, int column) const;
-    
+
     Grid grid;
     Grid tempGrid;
     bool running;

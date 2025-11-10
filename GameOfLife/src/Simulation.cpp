@@ -19,24 +19,32 @@ Simulation::Simulation(int width, int height, int cellSize)
     survival[3] = true;
 }
 
-void Simulation::Draw() const {
+void Simulation::Draw() const
+{
     grid.Draw();
 }
 
-void Simulation::Update() {
+void Simulation::Update()
+{
     if (!running) return;
     Step();
 }
 
-void Simulation::Step() {
-    for (int row = 0; row < grid.GetRows(); row++) {
-        for (int column = 0; column < grid.GetColumns(); column++) {
+void Simulation::Step()
+{
+    for (int row = 0; row < grid.GetRows(); row++)
+    {
+        for (int column = 0; column < grid.GetColumns(); column++)
+        {
             int liveNeighbors = CountLiveNeighbors(row, column);
             int cellValue = grid.GetCellValue(row, column);
 
-            if (cellValue == 1) {
+            if (cellValue == 1)
+            {
                 tempGrid.SetCellValue(row, column, survival[liveNeighbors] ? 1 : 0);
-            } else {
+            }
+            else
+            {
                 tempGrid.SetCellValue(row, column, birth[liveNeighbors] ? 1 : 0);
             }
         }
@@ -45,17 +53,19 @@ void Simulation::Step() {
     grid = tempGrid;
 }
 
-int Simulation::CountLiveNeighbors(int row, int column) const {
+int Simulation::CountLiveNeighbors(int row, int column) const
+{
     int liveNeighbors = 0;
 
     // Check all 8 neighbors
     std::pair<int, int> neighborOffsets[] = {
         {-1, -1}, {-1, 0}, {-1, 1},
-        {0, -1},           {0, 1},
-        {1, -1},  {1, 0},  {1, 1}
+        {0, -1}, {0, 1},
+        {1, -1}, {1, 0}, {1, 1}
     };
 
-    for (const auto& offset : neighborOffsets) {
+    for (const auto& offset : neighborOffsets)
+    {
         int neighborRow = (row + offset.first + grid.GetRows()) % grid.GetRows();
         int neighborColumn = (column + offset.second + grid.GetColumns()) % grid.GetColumns();
         liveNeighbors += grid.GetCellValue(neighborRow, neighborColumn);
@@ -64,24 +74,29 @@ int Simulation::CountLiveNeighbors(int row, int column) const {
     return liveNeighbors;
 }
 
-void Simulation::ClearGrid() {
+void Simulation::ClearGrid()
+{
     grid.Clear();
 }
 
-void Simulation::CreateRandomState() {
+void Simulation::CreateRandomState()
+{
     grid.FillRandom();
 }
 
-void Simulation::ToggleCell(int row, int column) {
+void Simulation::ToggleCell(int row, int column)
+{
     grid.ToggleCell(row, column);
 }
 
-int Simulation::GetCellValue(int row, int column) const {
+int Simulation::GetCellValue(int row, int column) const
+{
     return grid.GetCellValue(row, column);
 }
 
 // Trim both ends (safe for empty/all-space strings)
-static std::string trim_copy(const std::string& s) {
+static std::string trim_copy(const std::string& s)
+{
     if (s.empty()) return std::string();
     size_t first = 0;
     while (first < s.size() && std::isspace(static_cast<unsigned char>(s[first]))) ++first;
@@ -91,9 +106,11 @@ static std::string trim_copy(const std::string& s) {
     return s.substr(first, last - first + 1);
 }
 
-bool Simulation::LoadFromLife106(const std::string& filePath, std::vector<std::string>& warnings) {
+bool Simulation::LoadFromLife106(const std::string& filePath, std::vector<std::string>& warnings)
+{
     std::ifstream in(filePath);
-    if (!in.is_open()) {
+    if (!in.is_open())
+    {
         warnings.push_back("Cannot open file: " + filePath);
         return false;
     }
@@ -118,58 +135,81 @@ bool Simulation::LoadFromLife106(const std::string& filePath, std::vector<std::s
     int centerRow = grid.GetRows() / 2;
     int centerCol = grid.GetColumns() / 2;
 
-    while (std::getline(in, line)) {
+    while (std::getline(in, line))
+    {
         ++lineNo;
         std::string t = trim_copy(line);
         if (t.empty()) continue;
 
-        if (!headerChecked) {
+        if (!headerChecked)
+        {
             headerChecked = true;
-            if (t != "Life 1.06") {
-                warnings.push_back("Missing or invalid header 'Life 1.06' at line " + std::to_string(lineNo) + "; found: '" + t + "'");
+            if (t != "Life 1.06")
+            {
+                warnings.push_back(
+                    "Missing or invalid header 'Life 1.06' at line " + std::to_string(lineNo) + "; found: '" + t + "'");
             }
         }
 
-        if (!t.empty() && t[0] == '#') {
+        if (!t.empty() && t[0] == '#')
+        {
             //  #N or #R
-            if (t.size() >= 2 && (t[1] == 'N' || t[1] == 'n')) {
+            if (t.size() >= 2 && (t[1] == 'N' || t[1] == 'n'))
+            {
                 // #N <name>
                 std::string name = t.size() > 2 ? trim_copy(t.substr(2)) : std::string();
                 universeName = name;
                 hasName = true;
-            } else if (t.size() >= 2 && (t[1] == 'R' || t[1] == 'r')) {
+            }
+            else if (t.size() >= 2 && (t[1] == 'R' || t[1] == 'r'))
+            {
                 // #R Bx/Sy
                 std::string rest = t.size() > 2 ? trim_copy(t.substr(2)) : std::string();
                 rest.erase(std::remove_if(rest.begin(), rest.end(), ::isspace), rest.end());
                 // Expect format with B
                 size_t posB = rest.find_first_of("Bb");
                 size_t posS = rest.find_first_of("Ss");
-                if (posB == std::string::npos || posS == std::string::npos) {
+                if (posB == std::string::npos || posS == std::string::npos)
+                {
                     warnings.push_back("Invalid #R rule at line " + std::to_string(lineNo) + ": '" + t + "'");
-                } else {
+                }
+                else
+                {
                     std::string bpart = rest.substr(posB + 1, posS - (posB + 1));
                     std::string spart = rest.substr(posS + 1);
                     // reset rules
                     birth.fill(false);
                     survival.fill(false);
                     bool ok = true;
-                    for (char c : bpart) {
-                        if (c >= '0' && c <= '8') {
+                    for (char c : bpart)
+                    {
+                        if (c >= '0' && c <= '8')
+                        {
                             birth[c - '0'] = true;
-                        } else {
+                        }
+                        else
+                        {
                             ok = false;
                         }
                     }
-                    for (char c : spart) {
-                        if (c >= '0' && c <= '8') {
+                    for (char c : spart)
+                    {
+                        if (c >= '0' && c <= '8')
+                        {
                             survival[c - '0'] = true;
-                        } else {
+                        }
+                        else
+                        {
                             ok = false;
                         }
                     }
-                    if (!ok) {
-                        warnings.push_back("Invalid digits in #R rule at line " + std::to_string(lineNo) + ": '" + t + "'");
-                    } else {
+                    if (!ok)
+                    {
+                        warnings.push_back(
+                            "Invalid digits in #R rule at line " + std::to_string(lineNo) + ": '" + t + "'");
+                    }
+                    else
+                    {
                         hasRule = true;
                     }
                 }
@@ -179,7 +219,8 @@ bool Simulation::LoadFromLife106(const std::string& filePath, std::vector<std::s
 
         std::istringstream iss(t);
         int x, y;
-        if (!(iss >> x >> y)) {
+        if (!(iss >> x >> y))
+        {
             warnings.push_back("Cannot parse coordinates at line " + std::to_string(lineNo) + ": '" + t + "'");
             continue;
         }
@@ -187,14 +228,20 @@ bool Simulation::LoadFromLife106(const std::string& filePath, std::vector<std::s
         int row = centerRow + y;
         int col = centerCol + x;
 
-        if (!grid.IsWithinBounds(row, col)) {
-            warnings.push_back("Coordinate out of bounds at line " + std::to_string(lineNo) + ": (" + std::to_string(x) + "," + std::to_string(y) + ") mapped to (" + std::to_string(row) + "," + std::to_string(col) + ")");
+        if (!grid.IsWithinBounds(row, col))
+        {
+            warnings.push_back(
+                "Coordinate out of bounds at line " + std::to_string(lineNo) + ": (" + std::to_string(x) + "," +
+                std::to_string(y) + ") mapped to (" + std::to_string(row) + "," + std::to_string(col) + ")");
             continue;
         }
 
         long long key = (static_cast<long long>(row) << 32) | static_cast<unsigned int>(col);
-        if (placed.find(key) != placed.end()) {
-            warnings.push_back("Duplicate coordinate (same cell) at line " + std::to_string(lineNo) + ": (" + std::to_string(x) + "," + std::to_string(y) + ")");
+        if (placed.find(key) != placed.end())
+        {
+            warnings.push_back(
+                "Duplicate coordinate (same cell) at line " + std::to_string(lineNo) + ": (" + std::to_string(x) + "," +
+                std::to_string(y) + ")");
             continue;
         }
 
@@ -202,10 +249,12 @@ bool Simulation::LoadFromLife106(const std::string& filePath, std::vector<std::s
         placed.insert(key);
     }
 
-    if (!hasName) {
+    if (!hasName)
+    {
         warnings.push_back("No universe name (#N) found in file");
     }
-    if (!hasRule) {
+    if (!hasRule)
+    {
         warnings.push_back("No rule (#R Bx/Sy) found in file — defaulting to B3/S23");
     }
 
@@ -214,15 +263,18 @@ bool Simulation::LoadFromLife106(const std::string& filePath, std::vector<std::s
     return true;
 }
 
-bool Simulation::SaveToLife106(const std::string& outPath, std::string* err) const {
+bool Simulation::SaveToLife106(const std::string& outPath, std::string* err) const
+{
     std::ofstream out(outPath);
-    if (!out.is_open()) {
+    if (!out.is_open())
+    {
         if (err) *err = "Cannot open output file: " + outPath;
         return false;
     }
 
     out << "Life 1.06\n";
-    if (!universeName.empty()) {
+    if (!universeName.empty())
+    {
         out << "#N " << universeName << "\n";
     }
     // write rule
@@ -234,9 +286,12 @@ bool Simulation::SaveToLife106(const std::string& outPath, std::string* err) con
 
     int centerRow = grid.GetRows() / 2;
     int centerCol = grid.GetColumns() / 2;
-    for (int r = 0; r < grid.GetRows(); ++r) {
-        for (int c = 0; c < grid.GetColumns(); ++c) {
-            if (grid.GetCellValue(r, c) != 0) {
+    for (int r = 0; r < grid.GetRows(); ++r)
+    {
+        for (int c = 0; c < grid.GetColumns(); ++c)
+        {
+            if (grid.GetCellValue(r, c) != 0)
+            {
                 int x = c - centerCol;
                 int y = r - centerRow;
                 out << x << " " << y << "\n";
